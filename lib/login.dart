@@ -1,7 +1,7 @@
+import 'package:firebase_flutter/home.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,32 +12,33 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  Future<dynamic> _signInWithGoogle() async {
+  Future<void> _signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return; // Sign-in was canceled
 
-      if (googleUser == null) {
-        return;
-      }
-
-      print('Google User: ${googleUser.displayName}');
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
-      User? user = userCredential.user;
+      // Sign in to Firebase with the Google credentials
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Manually retrieve user info after sign-in
+      User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Signed in as ${user.displayName}')),
         );
 
+        // Navigate to the HomePage with user details
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage(user: user)),
@@ -51,21 +52,81 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _signInWithEmail() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      User? user = userCredential.user;
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage(user: user)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign in: $e')),
+      );
+    }
+  }
+
+  Future<void> _registerWithEmail() async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      User? user = userCredential.user;
+      if (user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registered as ${user.email}')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage(user: user)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to register: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login Page'),
+        title: Text('Login Page'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Sign in with Google'),
-            const SizedBox(height: 20),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _signInWithEmail,
+              child: Text('Login with Email'),
+            ),
+            ElevatedButton(
+              onPressed: _registerWithEmail,
+              child: Text('Register with Email'),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _signInWithGoogle,
-              child: const Text('Login with Google'),
+              child: Text('Sign in with Google'),
             ),
           ],
         ),

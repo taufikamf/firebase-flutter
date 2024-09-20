@@ -4,44 +4,45 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'home.dart';
-import 'daftar.dart'; // Import halaman Daftar
+import 'login.dart'; // Pastikan file ini ada di proyek
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class DaftarPage extends StatefulWidget {
+  const DaftarPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _DaftarPageState createState() => _DaftarPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _DaftarPageState extends State<DaftarPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> _signInWithGoogle() async {
+  Future<dynamic> _signInWithGoogle() async {
     try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // Sign-in was canceled
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      final googleAuth = await googleUser.authentication;
+      if (googleUser == null) {
+        return;
+      }
+
+      print('Google User: ${googleUser.displayName}');
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase with the Google credentials
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Manually retrieve user info after sign-in
-      User? user = FirebaseAuth.instance.currentUser;
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      User? user = userCredential.user;
 
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Signed in as ${user.displayName}')),
         );
 
-        // Navigate to the HomePage with user details
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage(user: user)),
@@ -60,13 +61,14 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
+          // Background image
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
             child: Image.asset(
-              'assets/backgrounddd.png',
+              'assets/backgrounddd.png', // Ganti dengan path gambar background yang diinginkan
               fit: BoxFit.cover,
             ),
           ),
@@ -77,9 +79,9 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 250),
+                  SizedBox(height: 250), // Jarak dari atas
                   Text(
-                    'Masuk',
+                    'Daftar',
                     style: GoogleFonts.poppins(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -88,9 +90,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 40),
                   Align(
-                    alignment: Alignment.center,
+                    alignment: Alignment.center, // Memposisikan di tengah
                     child: SizedBox(
-                      width: 340,
+                      width: 340, // Atur ukuran lebar box Email
                       child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Email',
@@ -106,10 +108,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   SizedBox(height: 20),
+                  // Password Input
                   Align(
-                    alignment: Alignment.center,
+                    alignment: Alignment.center, // Memposisikan di tengah
                     child: SizedBox(
-                      width: 340,
+                      width: 340, // Atur ukuran lebar box Password
                       child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Password',
@@ -124,11 +127,13 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  // Button Login with Google
+
                   SizedBox(height: 30),
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      'Atau masuk dengan',
+                      'Atau daftar dengan',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                       ),
@@ -148,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                         elevation: 5,
                       ),
                       icon: Image.asset(
-                        'assets/google.png',
+                        'assets/google.png', // Ikon Google
                         width: 24,
                         height: 24,
                       ),
@@ -162,18 +167,19 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: 30),
                   Align(
                     alignment: Alignment.center,
                     child: RichText(
                       text: TextSpan(
-                        text: 'Belum memiliki akun? ',
+                        text: 'Sudah memiliki akun?? ',
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                            text: 'Daftar',
+                            text: 'Masuk',
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
                               color: Colors.blue,
@@ -182,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                               ..onTap = () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => DaftarPage()), // Navigasi ke halaman Daftar
+                                  MaterialPageRoute(builder: (context) => LoginPage()), // Navigasi ke halaman Daftar
                                 );
                               },
                           ),

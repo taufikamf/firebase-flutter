@@ -90,7 +90,7 @@ packages:
     source: hosted
     version: "5.3.0"
   firebase_auth_platform_interface:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: firebase_auth_platform_interface
       sha256: f1f32cdba3f5620082c63d18545dd58dde8f5ffc66caa43feb9b9fe57e93d4b6
@@ -209,7 +209,7 @@ packages:
     source: hosted
     version: "0.12.4+2"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: b9c29a161230ee03d3ccf545097fccd9b87a5264228c5d348202e0f0c28f9010

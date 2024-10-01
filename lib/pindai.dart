@@ -1,27 +1,10 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'konfirmasi_paspor.dart'; // Import the ConfirmPhotoScreen
-
-void main() {
-  runApp(const PassportScanApp());
-}
-
-class PassportScanApp extends StatelessWidget {
-  const PassportScanApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Passport Scan App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const PassportScanScreen(),
-    );
-  }
-}
+import 'package:http/http.dart' as http;
+import 'konfirmasi_paspor.dart';
 
 class PassportScanScreen extends StatefulWidget {
   const PassportScanScreen({super.key});
@@ -31,7 +14,9 @@ class PassportScanScreen extends StatefulWidget {
 }
 
 class _PassportScanScreenState extends State<PassportScanScreen> {
-  File? _image; // Variable to store the scanned image
+  File? _image;
+  bool _isLoading = false;
+  String? _mrzResult;
 
   // Function to pick image from camera
   Future<void> _pickImageFromCamera() async {
@@ -39,9 +24,10 @@ class _PassportScanScreenState extends State<PassportScanScreen> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        _mrzResult = null;
       });
 
-      // After the image is picked, navigate to the confirm screen
+      // Navigate to the confirm photo screen after picking the image
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -51,18 +37,56 @@ class _PassportScanScreenState extends State<PassportScanScreen> {
     }
   }
 
+  // Function to send the image to the backend for MRZ processing
+  Future<void> _sendImageToBackend() async {
+    if (_image == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://localhost:3000'), // Replace with your actual API URL
+      );
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'image',
+        _image!.path,
+      ));
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var decodedResponse = json.decode(responseData);
+        setState(() {
+          _mrzResult = decodedResponse['mrz_result'];
+        });
+      } else {
+        // Handle error
+        print('Failed to get MRZ result');
+      }
+    } catch (e) {
+      print('Error sending image: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView( // Tambahkan SingleChildScrollView untuk scroll
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 35),
-              // Title
               Text(
                 "Pemindaian Paspor",
                 style: GoogleFonts.poppins(
@@ -73,7 +97,6 @@ class _PassportScanScreenState extends State<PassportScanScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              // Subtitle
               Text(
                 "Dengan menggunakan kamera belakang ponsel, pindai paspor anda.",
                 style: GoogleFonts.poppins(
@@ -83,7 +106,6 @@ class _PassportScanScreenState extends State<PassportScanScreen> {
                 textAlign: TextAlign.start,
               ),
               const SizedBox(height: 40),
-              // Image Placeholder or scanned image
               Center(
                 child: _image != null
                     ? ClipRRect(
@@ -95,17 +117,31 @@ class _PassportScanScreenState extends State<PassportScanScreen> {
                   ),
                 )
                     : Image.asset(
-                  'assets/paspor.png', // Replace with your asset image path
+                  'assets/paspor.png',
                   height: 280,
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 40),
-              // Instruction Box
+              const SizedBox(height: 20),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (_mrzResult != null)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'MRZ Result: $_mrzResult',
+                    style: GoogleFonts.poppins(fontSize: 16),
+                  ),
+                ),
+              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(25),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 129, 167, 218), // Light blue color
+                  color: const Color.fromARGB(255, 129, 167, 218),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Column(
@@ -150,12 +186,11 @@ class _PassportScanScreenState extends State<PassportScanScreen> {
                 ),
               ),
               const SizedBox(height: 35),
-              // Scan Button
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: _pickImageFromCamera, // Trigger the camera function
+                  onPressed: _pickImageFromCamera,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade900,
                     padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),

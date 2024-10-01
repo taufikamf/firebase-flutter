@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => PassportScanApp()),  // Navigate to PassportScanApp
+          MaterialPageRoute(builder: (context) => Porsi()),  // Navigate to PassportScanApp
         );
       }
     } catch (e) {
@@ -99,14 +99,15 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Image.asset(
-              'assets/backgrounddd.png',
-              fit: BoxFit.cover,
+          // Menggunakan Container dengan MediaQuery untuk latar belakang penuh
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/background2.png'),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           Center(
@@ -125,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.blue.shade900,
                     ),
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 30),
                   Align(
                     alignment: Alignment.center,
                     child: SizedBox(
@@ -172,8 +173,8 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: _signInWithEmail,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade900,
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 100, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25.0),
                         ),
@@ -185,74 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Atau masuk dengan',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  Align(
-                    alignment: Alignment.center,
-                    child: ElevatedButton.icon(
-                      onPressed: _signInWithGoogle,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                        elevation: 5,
-                      ),
-                      icon: Image.asset(
-                        'assets/google.png',
-                        width: 24,
-                        height: 24,
-                      ),
-                      label: Text(
-                        'Login dengan Google',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.blue.shade900,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.center,
-                    child: RichText(
-                      text: TextSpan(
-                        text: 'Belum memiliki akun? ',
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Daftar',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => DaftarPage()), // Navigasi ke halaman Daftar
-                                );
-                              },
-                          ),
-                        ],
                       ),
                     ),
                   ),

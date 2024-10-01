@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'pindai.dart';
+import 'inquiry.dart';
+import 'login.dart'; // Import halaman login di sini
 
 void main() {
   runApp(const Porsi());
@@ -25,8 +26,18 @@ class Porsi extends StatelessWidget {
           title: const Text('Nomor Porsi'),
           backgroundColor: Colors.white,
           elevation: 0,
-          leading: const Icon(Icons.arrow_back, color: Colors.black),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () {
+              // Navigasi ke halaman LoginPage ketika tombol panah ditekan
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
         ),
+        backgroundColor: Colors.white,
         body: const InquiryForm(),
       ),
     );
@@ -91,7 +102,6 @@ class _InquiryFormState extends State<InquiryForm>
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(),
-                // Hilangkan box shadow untuk tampilan lebih polos
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey, width: 1),
                 ),
@@ -108,7 +118,7 @@ class _InquiryFormState extends State<InquiryForm>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PassportScanApp(),
+                      builder: (context) => const InfoDasar(),
                     ),
                   );
                 },

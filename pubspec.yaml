@@ -41,6 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.2.2
   image_picker: ^1.1.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
@@ -102,3 +103,4 @@ flutter:
     - assets/backgrounddd.png
     - assets/konfirmpaspor.png
     - assets/paspor.png
+    - assets/background2.png

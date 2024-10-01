@@ -76,7 +76,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 Text(
                   "Penggunaan Data",
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -108,7 +108,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 Text(
                   "Penyimpanan Data",
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -156,13 +156,13 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 Text(
                   "Kontak Kami",
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini atau tentang cara kami mengelola data pribadi Anda, silakan hubungi kami di [alamat email] atau [nomor telepon].",
+                  "Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini atau tentang cara kami mengelola data pribadi Anda, silakan hubungi kami di birohdi@kemenag.go.id atau 021 348 3304-20.",
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                   ),

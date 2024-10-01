@@ -6,7 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home.dart';
-import 'login.dart'; // Pastikan file ini ada di proyek
+import 'login.dart';
 
 class DaftarPage extends StatefulWidget {
   const DaftarPage({Key? key}) : super(key: key);
@@ -236,7 +236,7 @@ class _DaftarPageState extends State<DaftarPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                        EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25.0),
                         ),

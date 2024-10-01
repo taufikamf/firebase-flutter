@@ -5,18 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'home.dart';
-import 'daftar.dart'; // Import halaman Daftar
+import 'pindai.dart';
+import 'no_porsi.dart';
+import 'daftar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
-
-
   @override
   _LoginPageState createState() => _LoginPageState();
-
-
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -47,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       if (user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage(user: user)),
+          MaterialPageRoute(builder: (context) => Porsi()),  // Navigate to PassportScanApp
         );
       }
     } catch (e) {
@@ -68,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       print('Google User: ${googleUser.displayName}');
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -76,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+      await _auth.signInWithCredential(credential);
       User? user = userCredential.user;
 
       if (user != null) {
@@ -86,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage(user: user)),
+          MaterialPageRoute(builder: (context) => PassportScanApp()),  // Navigate to PassportScanApp
         );
       }
     } catch (e) {
@@ -168,12 +165,11 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 30),
                   Align(
                     alignment: Alignment.center,
                     child: ElevatedButton(
-                      onPressed:  _signInWithEmail,
+                      onPressed: _signInWithEmail,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade900,
                         padding:
@@ -192,8 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
-                  SizedBox(height: 30),
+                  SizedBox(height: 15),
                   Align(
                     alignment: Alignment.center,
                     child: Text(
@@ -203,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 15),
                   Align(
                     alignment: Alignment.center,
                     child: ElevatedButton.icon(
@@ -211,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                        EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25.0),
                         ),
@@ -232,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   Align(
                     alignment: Alignment.center,
                     child: RichText(
@@ -253,8 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          DaftarPage()), // Navigasi ke halaman Daftar
+                                      builder: (context) => DaftarPage()), // Navigasi ke halaman Daftar
                                 );
                               },
                           ),
@@ -270,19 +264,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-Widget _buildSocialIcon(String assetPath) {
-  return Container(
-    padding: EdgeInsets.all(12.0),
-    decoration: BoxDecoration(
-      color: Colors.grey.shade200,
-      shape: BoxShape.circle,
-    ),
-    child: Image.asset(
-      assetPath,
-      width: 24,
-      height: 24,
-    ),
-  );
 }

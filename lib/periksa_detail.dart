@@ -41,6 +41,7 @@ class _PassportVerificationScreenState
   void initState() {
     super.initState();
     _passportData = widget.passportData ?? {};
+    print('Passport Data: $_passportData'); // Print the passportData
   }
 
   // Function to pick image from the camera and navigate to the confirm screen

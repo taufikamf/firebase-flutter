@@ -2,17 +2,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase-flutter/periksa_detail.dart'
+import 'package:firebase_flutter/periksa_detail.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'periksa_detail.dart';
 import 'dart:convert';
 
-
 class ConfirmPhotoScreen extends StatefulWidget {
   final File image; // The scanned image file
 
-  const ConfirmPhotoScreen({Key? key, required this.image}) : super(key: key);
+  const ConfirmPhotoScreen({super.key, required this.image});
 
   @override
   _ConfirmPhotoScreenState createState() => _ConfirmPhotoScreenState();
@@ -29,7 +28,8 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
 
   // Function to pick image from the camera
   Future<void> _pickImageFromCamera() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path); // Update the image state with new scan
@@ -38,8 +38,9 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
   }
 
   // Function to pick image from the gallery
-  Future<void> _pickImageFromGallery() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> _pickImageFromGallery(BuildContext context) async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path); // Update the image state
@@ -48,8 +49,9 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
   }
 
   // Function to send the image to the API
-  Future<void> _uploadImage(File image) async {
-    final url = Uri.parse('https://c18e-182-0-249-237.ngrok-free.app/ocr'); // Replace with your API URL
+  Future<void> _uploadImage(File image, BuildContext context) async {
+    final url = Uri.parse(
+        'https://c18e-182-0-249-237.ngrok-free.app/ocr'); // Replace with your API URL
     print(url);
     var request = http.MultipartRequest('POST', url);
     request.files.add(await http.MultipartFile.fromPath(
@@ -62,13 +64,17 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        // Convert response to string
         final responseBody = await response.stream.bytesToString();
-        print(responseBody);
-
-        // You can also parse the response if it's in JSON format
         var jsonResult = jsonDecode(responseBody);
-        // print('Parsed result: ${jsonResult['names']}'); // Assuming the result is in the 'result' field
+
+        print(jsonResult);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                PassportVerificationApp(passportData: jsonResult),
+          ),
+        );
       } else {
         // Handle error
         print('Failed to upload image: ${response.statusCode}');
@@ -137,7 +143,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                       ),
                     ),
                   ),
-                  Positioned(
+                  const Positioned(
                     top: 8,
                     right: 8,
                     child: Icon(
@@ -164,7 +170,8 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                           },
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: BorderSide(color: Color.fromARGB(255, 22, 72, 113)),
+                            side: const BorderSide(
+                                color: Color.fromARGB(255, 22, 72, 113)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -180,11 +187,12 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                       const SizedBox(width: 20),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _pickImageFromGallery,
+                          onPressed: () => _pickImageFromGallery(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             backgroundColor: Colors.white,
-                            side: BorderSide(color: Color.fromARGB(255, 22, 72, 113)),
+                            side: const BorderSide(
+                                color: Color.fromARGB(255, 22, 72, 113)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -192,7 +200,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                           child: Text(
                             'Upload Foto',
                             style: GoogleFonts.poppins(
-                              color: Color.fromARGB(255, 22, 72, 113),
+                              color: const Color.fromARGB(255, 22, 72, 113),
                             ),
                           ),
                         ),
@@ -205,17 +213,14 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                       width: double.infinity, // Make the button take full width
                       child: ElevatedButton(
                         onPressed: () async {
-                          await _uploadImage(_image); // Upload the image when Lanjutkan is clicked
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PassportVerificationApp(passporData),
-                            ),
-                          ); // Navigate to the next screen
+                          await _uploadImage(_image,
+                              context); // Upload the image when Lanjutkan is clickeds
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 22, 72, 113),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          backgroundColor:
+                              const Color.fromARGB(255, 22, 72, 113),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),

@@ -1,13 +1,7 @@
-import 'package:flutter/gestures.dart';
+import 'package:firebase_flutter/home.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'pindai.dart';
-import 'no_porsi.dart';
-import 'daftar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -21,17 +15,41 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<http.Response> createusers(String email, String uid) {
-    return http.post(
-      Uri.parse('https://jsonplaceholder.typicode.com/albums'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'uid': uid,
-      }),
-    );
+  Future<void> _signInWithGoogle() async {
+    try {
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return; // Sign-in was canceled
+
+      final googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credentials
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Manually retrieve user info after sign-in
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Signed in as ${user.displayName}')),
+        );
+
+        // Navigate to the HomePage with user details
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage(user: user)),
+        );
+      }
+    } catch (e) {
+      print('Sign-in error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign in with Google: $e')),
+      );
+    }
   }
 
   Future<void> _signInWithEmail() async {
@@ -44,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       if (user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Porsi()),  // Navigate to PassportScanApp
+          MaterialPageRoute(builder: (context) => HomePage(user: user)),
         );
       }
     } catch (e) {
@@ -54,42 +72,25 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<dynamic> _signInWithGoogle() async {
+  Future<void> _registerWithEmail() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-      if (googleUser == null) {
-        return;
-      }
-
-      print('Google User: ${googleUser.displayName}');
-
-      final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
-
-      UserCredential userCredential =
-      await _auth.signInWithCredential(credential);
       User? user = userCredential.user;
-
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Signed in as ${user.displayName}')),
+          SnackBar(content: Text('Registered as ${user.email}')),
         );
-
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Porsi()),  // Navigate to PassportScanApp
+          MaterialPageRoute(builder: (context) => HomePage(user: user)),
         );
       }
     } catch (e) {
-      print('Sign-in error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign in with Google: $e')),
+        SnackBar(content: Text('Failed to register: $e')),
       );
     }
   }
@@ -97,103 +98,38 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Menggunakan Container dengan MediaQuery untuk latar belakang penuh
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/background2.png'),
-                fit: BoxFit.cover,
-              ),
+      appBar: AppBar(
+        title: Text('Login Page'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
             ),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(40.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 250),
-                  Text(
-                    'Masuk',
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade900,
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: 340,
-                      child: TextField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          hintText: 'Email',
-                          filled: true,
-                          fillColor: Colors.grey.shade200,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        style: GoogleFonts.poppins(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: 340,
-                      child: TextField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          hintText: 'Password',
-                          filled: true,
-                          fillColor: Colors.grey.shade200,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        style: GoogleFonts.poppins(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Align(
-                    alignment: Alignment.center,
-                    child: ElevatedButton(
-                      onPressed: _signInWithEmail,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade900,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                      ),
-                      child: Text(
-                        'Masuk',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
             ),
-          ),
-        ],
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _signInWithEmail,
+              child: Text('Login with Email'),
+            ),
+            ElevatedButton(
+              onPressed: _registerWithEmail,
+              child: Text('Register with Email'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _signInWithGoogle,
+              child: Text('Sign in with Google'),
+            ),
+          ],
+        ),
       ),
     );
   }

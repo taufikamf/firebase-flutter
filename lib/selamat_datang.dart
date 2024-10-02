@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'syarat.dart'; // Import SyaratScreen
+import 'login.dart'; // Import SyaratScreen
 
 class SelamatDatang extends StatelessWidget {
   const SelamatDatang({super.key});
@@ -8,6 +8,7 @@ class SelamatDatang extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Set background color to white
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -15,9 +16,11 @@ class SelamatDatang extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Row for the title, line, and logo
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // Text
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -39,20 +42,24 @@ class SelamatDatang extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12),
+                    // Vertical Line on the right side of the text
                     Container(
-                      height: 60,
-                      width: 1,
-                      color: Colors.black,
+                      width: 4, // Thickness of the line
+                      height: 60, // Height of the line
+                      color: Colors.black, // Line color changed to black
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12), // Add some spacing
+                    // Logo next to the line
                     Image.asset(
-                      'assets/logo_kemenag.png',
-                      height: 80,
+                      'assets/logo_kemenag.png', // Adjust the asset path
+                      height: 75,
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
+
+                // Welcome Text
                 Text(
                   'Selamat Datang di Aplikasi Indonesia Visa Bio',
                   style: GoogleFonts.poppins(
@@ -69,14 +76,18 @@ class SelamatDatang extends StatelessWidget {
                     color: Colors.black54,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
+
+                // Illustration
                 Center(
                   child: Image.asset(
-                    'assets/gambar_2.png',
+                    'assets/gambar_2.png', // Adjust the asset path for the illustration
                     height: 200,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
+
+                // Important Information Section
                 Text(
                   'Informasi penting sebelum memulai',
                   style: GoogleFonts.poppins(
@@ -86,7 +97,7 @@ class SelamatDatang extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Aplikasi ini akan mengumpulkan email, dan paspor Anda sebagai bagian dari proses pendaftaran aplikasi visa Anda.',
+                  'Aplikasi ini akan mengumpulkan nomor porsi dan paspor Anda sebagai bagian dari proses pengajuan visa.',
                   textAlign: TextAlign.justify,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -95,16 +106,16 @@ class SelamatDatang extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Semua pemohon diminta untuk menyerahkan informasi pribadi, dokumen yang diminta serta pembayaran sebelum aplikasi visa diproses.',
+                  'Semua pemohon diminta untuk menyerahkan informasi pribadi, dokumen yang diperlukan, serta pembayaran sebelum pengajuan visa diproses.',
                   textAlign: TextAlign.justify,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: Colors.black54,
                   ),
                 ),
-                const SizedBox(height: 20), // Increased spacing
+                const SizedBox(height: 20),
 
-                // Bagian detail yang akan dikumpulkan
+                // Information Box (Details to be collected)
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -118,13 +129,13 @@ class SelamatDatang extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Icon(
-                            Icons.email,
+                            Icons.confirmation_number_outlined,
                             color: Colors.blue,
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Alamat email Anda valid',
+                              'Nomor Porsi',
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: const Color.fromARGB(255, 80, 89, 95),
@@ -156,25 +167,29 @@ class SelamatDatang extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30), // Adjusted spacing
+                const SizedBox(height: 30),
 
+                // Button to Proceed
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const SyaratScreen(),
+                          builder: (context) => const LoginPage(),
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 16),
+                          horizontal: 150, vertical: 16),
                       backgroundColor: const Color(0xFF00458B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0), // Proper rounding for the button
+                      ),
                     ),
                     child: Text(
-                      'MULAI PENDAFTARAN MANDIRI',
+                      'Mulai',
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 16,

@@ -2,7 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase-flutter/periksa_detail.dart'
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'periksa_detail.dart';
+import 'dart:convert';
+
 
 class ConfirmPhotoScreen extends StatefulWidget {
   final File image; // The scanned image file
@@ -22,6 +27,16 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
     _image = widget.image; // Initialize with the passed image
   }
 
+  // Function to pick image from the camera
+  Future<void> _pickImageFromCamera() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path); // Update the image state with new scan
+      });
+    }
+  }
+
   // Function to pick image from the gallery
   Future<void> _pickImageFromGallery() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -29,6 +44,37 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
       setState(() {
         _image = File(pickedFile.path); // Update the image state
       });
+    }
+  }
+
+  // Function to send the image to the API
+  Future<void> _uploadImage(File image) async {
+    final url = Uri.parse('https://c18e-182-0-249-237.ngrok-free.app/ocr'); // Replace with your API URL
+    print(url);
+    var request = http.MultipartRequest('POST', url);
+    request.files.add(await http.MultipartFile.fromPath(
+      'image', // Name of the file field in the API
+      image.path,
+    ));
+
+    // Send request
+    try {
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        // Convert response to string
+        final responseBody = await response.stream.bytesToString();
+        print(responseBody);
+
+        // You can also parse the response if it's in JSON format
+        var jsonResult = jsonDecode(responseBody);
+        // print('Parsed result: ${jsonResult['names']}'); // Assuming the result is in the 'result' field
+      } else {
+        // Handle error
+        print('Failed to upload image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
     }
   }
 
@@ -71,7 +117,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                 'Pastikan hasil foto jelas, sehingga kami dapat memverifikasi data anda',
                 textAlign: TextAlign.left,
                 style: GoogleFonts.poppins(
-                  fontSize: 17,
+                  fontSize: 15,
                   color: Colors.black,
                 ),
               ),
@@ -112,8 +158,9 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.pop(context); // Back to scan again
+                          onPressed: () async {
+                            // Call camera for scanning
+                            await _pickImageFromCamera();
                           },
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -136,9 +183,10 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                           onPressed: _pickImageFromGallery,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Colors.white,
                             side: BorderSide(color: Color.fromARGB(255, 22, 72, 113)),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
                           child: Text(
@@ -156,13 +204,14 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                     child: SizedBox(
                       width: double.infinity, // Make the button take full width
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          await _uploadImage(_image); // Upload the image when Lanjutkan is clicked
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const PassportVerificationApp(),
+                              builder: (context) => const PassportVerificationApp(passporData),
                             ),
-                          );// Add the navigation logic to the next screen here
+                          ); // Navigate to the next screen
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromARGB(255, 22, 72, 113),

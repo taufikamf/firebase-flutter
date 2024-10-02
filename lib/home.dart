@@ -12,13 +12,12 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: Text('Home Page'),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-              await GoogleSignIn().signOut();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -33,30 +32,13 @@ class HomePage extends StatelessWidget {
           children: [
             if (user.photoURL != null)
               CircleAvatar(
-                radius: 40,
                 backgroundImage: NetworkImage(user.photoURL!),
+                radius: 40,
               ),
-            const SizedBox(height: 20),
+            SizedBox(height: 16),
             Text(
-              user.displayName ?? 'No display name',
-              style: const TextStyle(fontSize: 24),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              user.email ?? 'No email available',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                await GoogleSignIn().signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-              child: const Text('Logout'),
+              'Welcome, ${user.displayName ?? 'User'}',
+              style: TextStyle(fontSize: 20),
             ),
           ],
         ),

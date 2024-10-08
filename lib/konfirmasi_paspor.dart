@@ -51,7 +51,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
   // Function to send the image to the API
   Future<void> _uploadImage(File image, BuildContext context) async {
     final url = Uri.parse(
-        'http://192.168.125.222:8080/ocr'); // Replace with your API URL
+        'http://10.104.19.128:8080/ocr'); // Replace with your API URL
     print(url);
     var request = http.MultipartRequest('POST', url);
     request.files.add(await http.MultipartFile.fromPath(

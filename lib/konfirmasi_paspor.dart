@@ -29,7 +29,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
   // Function to pick image from the camera
   Future<void> _pickImageFromCamera() async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path); // Update the image state with new scan
@@ -40,7 +40,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
   // Function to pick image from the gallery
   Future<void> _pickImageFromGallery(BuildContext context) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path); // Update the image state
@@ -51,8 +51,8 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
   // Function to send the image to the API
   Future<void> _uploadImage(File image, BuildContext context) async {
     final url = Uri.parse(
-        'http://192.168.125.222:8080/ocr'); // Replace with your API URL
-    print(url);
+        'http://10.104.19.111:5001/ocr');
+
     var request = http.MultipartRequest('POST', url);
     request.files.add(await http.MultipartFile.fromPath(
       'image', // Name of the file field in the API
@@ -218,7 +218,7 @@ class _ConfirmPhotoScreenState extends State<ConfirmPhotoScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              const Color.fromARGB(255, 22, 72, 113),
+                          const Color.fromARGB(255, 22, 72, 113),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 16),
                           shape: RoundedRectangleBorder(

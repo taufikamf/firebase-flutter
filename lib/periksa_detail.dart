@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'resume.dart'; // Ensure you have the correct import paths
 import 'konfirmasi_paspor.dart'; // Import the ConfirmPhotoScreen
 
 void main() {
@@ -28,20 +29,25 @@ class PassportVerificationScreen extends StatefulWidget {
   const PassportVerificationScreen({super.key, this.passportData});
 
   @override
-  _PassportVerificationScreenState createState() =>
-      _PassportVerificationScreenState();
+  _PassportVerificationScreenState createState() => _PassportVerificationScreenState();
 }
 
-class _PassportVerificationScreenState
-    extends State<PassportVerificationScreen> {
+class _PassportVerificationScreenState extends State<PassportVerificationScreen> {
   File? _scannedImage; // Variable to hold the scanned image
   late Map<String, dynamic> _passportData;
+  final TextEditingController issuingOfficeController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _passportData = widget.passportData ?? {};
     print('Passport Data: $_passportData'); // Print the passportData
+  }
+
+  @override
+  void dispose() {
+    issuingOfficeController.dispose();
+    super.dispose();
   }
 
   // Function to pick image from the camera and navigate to the confirm screen
@@ -57,9 +63,7 @@ class _PassportVerificationScreenState
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ConfirmPhotoScreen(
-              image:
-                  _scannedImage!), // Pass the scanned image to the confirm screen
+          builder: (context) => ConfirmPhotoScreen(image: _scannedImage!), // Pass the scanned image to the confirm screen
         ),
       );
     }
@@ -92,28 +96,50 @@ class _PassportVerificationScreenState
             ),
             const SizedBox(height: 15),
             _buildTextField("Nomor paspor", _passportData['number'] ?? ""),
-            _buildTextField(
-                "Kewarganegaraan", _passportData['nationality'] ?? ""),
-            _buildTextField(
-                "Tanggal Lahir", _passportData['date_of_birth'] ?? ""),
-            _buildTextField("Nama Keluarga", _passportData['surname'] ?? ""),
+            _buildTextField("Kewarganegaraan", _passportData['nationality'] ?? ""),
+            _buildTextField("Tanggal Lahir", _passportData['date_of_birth'] ?? ""),
+            _buildTextField("Nama Belakang", _passportData['surname'] ?? ""),
             _buildTextField("Nama Depan", _passportData['names'] ?? ""),
-            _buildTextField("Tanggal Habis Masa Berlaku",
-                _passportData['expiration_date'] ?? ""),
+            _buildTextField("Tanggal Habis Masa Berlaku", _passportData['expiration_date'] ?? ""),
             _buildTextField("Jenis Kelamin", _passportData['sex'] ?? ""),
+            _buildTextField("MRZ 1", _passportData['raw_first'] ?? ""),
+            _buildTextField("MRZ 2", _passportData['raw_second'] ?? ""),
+
+            // Updated field for "Kantor Yang Mengeluarkan"
+            Text(
+              "Kantor Yang Mengeluarkan",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 10),
+            TextFormField(
+              controller: issuingOfficeController,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+              ),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                hintStyle: GoogleFonts.poppins(
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Row for buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed:
-                      _pickImageFromCamera, // Call the function to pick image and navigate
+                  onPressed: _pickImageFromCamera, // Call the function to pick image and navigate
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     backgroundColor: Colors.white,
-                    side: const BorderSide(
-                        color: Color.fromARGB(255, 22, 72, 113)),
+                    side: const BorderSide(color: Color.fromARGB(255, 22, 72, 113)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -128,11 +154,21 @@ class _PassportVerificationScreenState
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Lanjutkan dengan logika untuk navigasi atau lainnya
+                    // Update the passport data with the issuing office
+                    _passportData['issuing_office'] = issuingOfficeController.text;
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PassportResumeScreen(
+                          scannedImage: _scannedImage,
+                          passportData: _passportData,
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                     backgroundColor: const Color(0xFF00458B),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
